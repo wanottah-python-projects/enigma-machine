@@ -1,4 +1,7 @@
 
+import pygame
+
+
 # standard alphabet
 ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
@@ -20,6 +23,19 @@ ROTOR_V_NOTCH = "Z"
 REFLECTOR_A = "EJMZALYXVBWFCRQUONTSPIKHGD"
 REFLECTOR_B = "YRUHQSLDPXNGOKMIEBFZCWVJAT"
 REFLECTOR_C = "FVPJIAOYEDRZXWGCTKUQSBNMHL"
+
+
+# setup pygame
+pygame.init()
+
+pygame.font.init()
+
+pygame.display.set_caption("Enigma Simulator")
+
+SCREEN_WIDTH = 1600
+SCREEN_HEIGHT = 600
+
+SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
 
 class Enigma:
@@ -273,6 +289,7 @@ ENIGMA.set_rings((5, 26, 2))
 # set message key
 ENIGMA.set_key("CAT")
 
+"""
 # encipher message
 message = "THIS COOL ENIGMA MACHINE"
 
@@ -283,3 +300,20 @@ for letter in message:
     cipher_text += ENIGMA.encipher(letter)
 
 print(cipher_text)
+"""
+
+animating_display = True
+
+while animating_display:
+
+    SCREEN.fill("#333333")
+
+    pygame.display.flip()
+
+    for event in pygame.event.get():
+
+        if event.type == pygame.QUIT:
+
+            animating_display = False
+            
+
