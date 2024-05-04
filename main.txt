@@ -1,0 +1,81 @@
+
+import pygame
+
+import GlobalConstants
+
+from EnigmaMachine import ENIGMA
+from DrawComponents import draw_components
+
+c = GlobalConstants
+
+
+pygame.display.set_caption("Enigma Simulator")
+
+
+application_running = True
+
+while application_running:
+
+    # background colour
+    c.SCREEN.fill("#333333")
+
+    # text input
+    text = c.BOLD_FONT.render(c.INPUT, True, "white")
+
+    text_box = text.get_rect(center = (c.SCREEN_WIDTH / 2, c.TEXT_MARGIN["top"] / 2))
+
+    c.SCREEN.blit(text, text_box)
+
+    # text output
+    text = c.MONO_FONT.render(c.OUTPUT, True, "white")
+
+    text_box = text.get_rect(center = (c.SCREEN_WIDTH / 2, c.TEXT_MARGIN["top"] / 2 + 25))
+
+    c.SCREEN.blit(text, text_box)
+
+    # draw enigma machine
+    draw_components(ENIGMA,
+                    c.SCREEN,
+                    c.SCREEN_WIDTH,
+                    c.SCREEN_HEIGHT,
+                    c.TEXT_MARGIN,
+                    c.COMPONENT_SPACING,
+                    c.BOLD_FONT)
+
+    # update screen
+    pygame.display.flip()
+
+    for event in pygame.event.get():
+
+        if event.type == pygame.QUIT:
+
+            application_running = False
+"""
+        elif event.type == pygame.KEYDOWN:
+
+            if event.key == pygame.K_DOWN:
+
+                # Enigma.rotor_iii.rotate()
+            
+            else:
+
+                key = event.unicode
+
+                if key in c.ALPHABET.lower():
+
+                    letter = key.upper()
+
+                    print(letter)
+
+                    c.INPUT += letter
+
+                    # PATH = ENIGMA.encipher(letter)
+
+                    print(c.PATH)
+
+                    # cipher = EN.encipher_message(letter)
+
+                    # print(cipher)
+
+                    # c.OUTPUT += cipher
+"""
