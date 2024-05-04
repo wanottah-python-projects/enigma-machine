@@ -1,148 +1,94 @@
 
-import pygame
+class EnigmaMachine:
 
-import GlobalConstants
-
-from KeyboardComponent import Keyboard
-from PlugboardComponent import Plugboard
-from RotorComponent import Rotor
-from ReflectorComponent import Reflector
-from LampboardComponent import Lampboard
-
-c = GlobalConstants
-
-
-# initialise rotors
-rotor_i = Rotor(c.ROTOR_I_WIRING, c.ROTOR_I_NOTCH_POSITION)
-rotor_ii = Rotor(c.ROTOR_II_WIRING, c.ROTOR_II_NOTCH_POSITION)
-rotor_iii = Rotor(c.ROTOR_III_WIRING, c.ROTOR_III_NOTCH_POSITION)
-rotor_iv = Rotor(c.ROTOR_IV_WIRING, c.ROTOR_IV_NOTCH_POSITION)
-rotor_v = Rotor(c.ROTOR_V_WIRING, c.ROTOR_V_NOTCH_POSITION)
-
-
-# initialise reflector
-reflector_a = Reflector(c.REFLECTOR_A)
-reflector_b = Reflector(c.REFLECTOR_B)
-reflector_c = Reflector(c.REFLECTOR_C)
-
-
-class Enigma:
-
-    def __init__(self, keyboard, plugboard, rotor_3, rotor_2, rotor_1, reflector, lampboard):
-
-        self.keyboard = keyboard
-
-        self.plugboard = plugboard
-
-        self.rotor_3 = rotor_3
-
-        self.rotor_2 = rotor_2
-
-        self.rotor_1 = rotor_1
+    def __init__(self, reflector, rotor1, rotor2, rotor3, plugboard, keyboard):  # lampboard, keyboard):
 
         self.reflector = reflector
+        self.rotor1 = rotor1
+        self.rotor2 = rotor2
+        self.rotor3 = rotor3
+        self.plugboard = plugboard
+        # self.lampboard = lampboard
+        self.keyboard = keyboard
 
-        self.lampboard = lampboard
+    def set_rings(self, ring):
 
-    def set_ring_positions(self, ring):
-
-        self.rotor_1.set_ring(ring[0])
-
-        self.rotor_2.set_ring(ring[1])
-
-        self.rotor_3.set_ring(ring[2])
+        self.rotor1.set_ring(ring[0])
+        self.rotor2.set_ring(ring[1])
+        self.rotor3.set_ring(ring[2])
 
     def set_key(self, key):
 
-        self.rotor_1.rotate_to_letter(key[0])
-
-        self.rotor_2.rotate_to_letter(key[1])
-
-        self.rotor_3.rotate_to_letter(key[2])
+        self.rotor1.rotate_to_letter(key[0])
+        self.rotor2.rotate_to_letter(key[1])
+        self.rotor3.rotate_to_letter(key[2])
 
     def encipher_message(self, letter):
 
         # rotate rotors
-        if self.rotor_2.left[0] == self.rotor_2.notch_position and self.rotor_3.left[0] == self.rotor_3.notch_position:
+        if self.rotor2.left[0] == self.rotor2.notch and self.rotor3.left[0] == self.rotor3.notch:
 
-            self.rotor_1.rotate()
+            self.rotor1.rotate()
+            self.rotor2.rotate()
+            self.rotor3.rotate()
 
-            self.rotor_2.rotate()
+        elif self.rotor2.left[0] == self.rotor2.notch:
 
-            self.rotor_2.rotate()
+            self.rotor1.rotate()
+            self.rotor2.rotate()
+            self.rotor3.rotate()
 
-        elif self.rotor_2.left[0] == self.rotor_2.notch_position:
+        elif self.rotor3.left[0] == self.rotor3.notch:
 
-            self.rotor_1.rotate()
-
-            self.rotor_2.rotate()
-
-            self.rotor_3.rotate()
-
-        elif self.rotor_3.left[0] == self.rotor_3.notch_position:
-
-            self.rotor_2.rotate()
-
-            self.rotor_3.rotate()
+            self.rotor2.rotate()
+            self.rotor3.rotate()
 
         else:
 
-            self.rotor_3.rotate()
+            self.rotor3.rotate()
 
         # pass signal through machine
-        signal = self.keyboard.letter_input(letter)
+        signal = self.keyboard.forward(letter)
+        path = [signal, signal]
 
-        path = [signal]
-
-        signal = self.plugboard.letter_input(signal)
-
+        signal = self.plugboard.forward(signal)
+        path.append(signal)
         path.append(signal)
 
-        signal = self.rotor_3.signal_input(signal)
-
+        signal = self.rotor3.forward(signal)
+        path.append(signal)
         path.append(signal)
 
-        signal = self.rotor_2.signal_input(signal)
-
+        signal = self.rotor2.forward(signal)
+        path.append(signal)
         path.append(signal)
 
-        signal = self.rotor_1.signal_input(signal)
-
+        signal = self.rotor1.forward(signal)
+        path.append(signal)
         path.append(signal)
 
-        signal = self.reflector.signal_input(signal)
-
+        signal = self.reflector.reflect(signal)
+        path.append(signal)
+        path.append(signal)
         path.append(signal)
 
-        signal = self.rotor_1.signal_output(signal)
-
+        signal = self.rotor1.backward(signal)
+        path.append(signal)
         path.append(signal)
 
-        signal = self.rotor_2.signal_output(signal)
-
+        signal = self.rotor2.backward(signal)
+        path.append(signal)
         path.append(signal)
 
-        signal = self.rotor_3.signal_output(signal)
-
+        signal = self.rotor3.backward(signal)
+        path.append(signal)
         path.append(signal)
 
-        signal = self.plugboard.letter_output(signal)
-
+        signal = self.plugboard.backward(signal)
+        path.append(signal)
         path.append(signal)
 
-        letter = self.lampboard.letter_output(signal)
+        # letter = self.lampboard.backward(signal)
+        letter = self.keyboard.backward(signal)
 
         return path, letter
-
-
-KEYBOARD = Keyboard()
-PLUGBOARD = Plugboard(["AB", "CD", "EF"])
-LAMPBOARD = Lampboard()
-
-ENIGMA = Enigma(KEYBOARD, PLUGBOARD, rotor_iii, rotor_ii, rotor_i, reflector_b, LAMPBOARD)
-
-# set ring position
-ENIGMA.set_ring_positions((1, 1, 1))
-
-# set message key
-ENIGMA.set_key("CAT")
