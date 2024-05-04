@@ -111,6 +111,10 @@ while application_running:
 
                 ROTOR_III.rotate()
 
+            elif event.key == pygame.K_SPACE:
+
+                c.INPUT += " "
+
             else:
 
                 key = event.unicode
